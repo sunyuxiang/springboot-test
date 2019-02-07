@@ -12,4 +12,10 @@ public class HelloWorldController {
         Metrics.counter("hello").increment();
         return "Hello World";
     }
+
+    @RequestMapping("/gauge")
+    public String gauge() {
+        Metrics.gauge("threadNumbers", 5);
+        return "ok";
+    }
 }
