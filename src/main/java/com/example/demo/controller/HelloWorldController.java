@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Random;
+import java.util.function.ToDoubleFunction;
 
 @RestController
 public class HelloWorldController {
@@ -19,11 +20,7 @@ public class HelloWorldController {
 
     @RequestMapping("/gauge")
     public String gauge() throws InterruptedException {
-        int i = 0;
-        while (i < 100) {
-            Thread.sleep(1000);
-            Metrics.gauge("threadNumbers", RANDOM.nextInt(100));
-        }
+        Metrics.gauge("threadNumbers", RANDOM, value -> value.nextInt(100));
         return "ok";
     }
 }
