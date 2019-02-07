@@ -2,6 +2,7 @@ package com.example.demo.metrics;
 
 import com.google.common.collect.ImmutableMap;
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.MeterBinder;
@@ -40,14 +41,7 @@ public class Meters implements MeterBinder {
         this.meterRegistry = registry;
     }
 
-//    public Meter getMeter(String meterName) {
-//        return getMeter(meterName, null);
-//    }
-//
-//    public Meter getMeter(String meterName, Map<String, String> tags) {
-//        String formattedMeterName = formatMetricAndTags(meterName, tags);
-//        return meterRegistry.meter(formattedMeterName);
-//    }
+
 //
 //
 //    public Timer getTimer(String timerName) {
