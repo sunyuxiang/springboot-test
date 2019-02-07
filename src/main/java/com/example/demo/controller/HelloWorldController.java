@@ -23,4 +23,16 @@ public class HelloWorldController {
         Metrics.gauge("threadNumbers", RANDOM, value -> value.nextInt(100));
         return "ok";
     }
+
+    @RequestMapping("/timer")
+    public String timer() throws InterruptedException {
+        Metrics.timer("threadNumbers").record(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        return "ok";
+    }
 }
