@@ -26,13 +26,22 @@ public class HelloWorldController {
 
     @RequestMapping("/timer")
     public String timer() throws InterruptedException {
-        Metrics.timer("threadNumbers").record(() -> {
+        Metrics.timer("sleepTime").record(() -> {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         });
+        return "ok";
+    }
+
+    @RequestMapping("/summary")
+    public String summary() throws InterruptedException {
+        int i = 0;
+        while (i < 100) {
+            Metrics.summary("ageSummary").record(RANDOM.nextInt(90));
+        }
         return "ok";
     }
 }
