@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
-import io.micrometer.core.annotation.Timed;
-import org.springframework.beans.factory.annotation.Value;
+import io.micrometer.core.instrument.Metrics;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloWorldController {
 
     @RequestMapping("/hello")
-    @Timed(value = "xxxx", longTask = true, histogram = true)
     public String index() {
+        Metrics.counter("hello").increment();
         return "Hello World";
     }
 }
