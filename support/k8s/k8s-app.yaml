@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-test-service
+  namespace: default
+  labels:
+    app: springboot-test-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8084
+    targetPort: 8084
+    nodePort: 30002
+    protocol: TCP
+  selector:
+    app: springboot-test-pod
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-test
+  labels:
+    app: springboot-test-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springboot-test-pod
+  template:
+    metadata:
+      labels:
+        app: springboot-test-pod
+    spec:
+      containers:
+      - name: springboot-test
+        image: syxplaydocker/springboot-test:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8084
