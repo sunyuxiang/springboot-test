@@ -18,6 +18,11 @@ public class HelloWorldController {
         return "Hello World";
     }
 
+    @RequestMapping("/")
+    public String entrance() {
+        return "welcome";
+    }
+
     @RequestMapping("/gauge")
     public String gauge() throws InterruptedException {
         Metrics.gauge("threadNumbers", RANDOM, value -> value.nextInt(100));

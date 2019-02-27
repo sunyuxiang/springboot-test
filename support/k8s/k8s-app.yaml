@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
       - name: springboot-test
-        image: syxplaydocker/springboot-test:0.0.1
+        image: syxplaydocker/autobuildtest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8084
