@@ -31,7 +31,6 @@ data:
       # * `prometheus.io/port`: If the metrics are exposed on a different port to the
       # service then set this appropriately.
     - job_name: 'kubernetes-service-endpoints'
-
       kubernetes_sd_configs:
       - role: endpoints
       relabel_configs:
@@ -59,7 +58,35 @@ data:
       - source_labels: [__meta_kubernetes_service_name]
         action: replace
         target_label: kubernetes_name
-
+    - job_name: 'prometheus-node-exporter'
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      # 只保留endpoints的annotations中含有prometheus.io/scrape: 'true'和port的name为prometheus-node-exporter的endpoint
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape, __meta_kubernetes_endpoint_port_name]
+        regex: true;prometheus-node-exporter
+        action: keep
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        action: replace
+        target_label: __scheme__
+        regex: (https?)
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: (.+)(?::\d+);(\d+)
+        replacement: $1:$2
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_service_name]
+        action: replace
+        target_label: kubernetes_name
 ---
 #prometheus server
 apiVersion: apps/v1
@@ -246,5 +273,60 @@ spec:
       nodePort: 30542
   selector:
     app: grafana
+
+---
+#node exporter
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: prometheus-node-exporter
+  namespace: monitoring
+  labels:
+    app: prometheus-node-exporter
+spec:
+  template:
+    metadata:
+      name: prometheus-node-exporter
+      labels:
+        app: prometheus-node-exporter
+    spec:
+      containers:
+      - image: prom/node-exporter
+        imagePullPolicy: IfNotPresent
+        name: prometheus-node-exporter
+        ports:
+        - name: prom-node-exp
+          #^ must be an IANA_SVC_NAME (at most 15 characters, ..)
+          containerPort: 9100
+          hostPort: 9100
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        effect: "NoSchedule"
+      hostNetwork: true
+      hostPID: true
+      hostIPC: true
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/app-metrics: 'true'
+    prometheus.io/app-metrics-path: '/metrics'
+  name: prometheus-node-exporter
+  namespace: monitoring
+  labels:
+    app: prometheus-node-exporter
+spec:
+  clusterIP: None
+  ports:
+    - name: prometheus-node-exporter
+      port: 9100
+      protocol: TCP
+  selector:
+    app: prometheus-node-exporter
+  type: ClusterIP
+
 
 

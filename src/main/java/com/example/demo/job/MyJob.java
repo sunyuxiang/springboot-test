@@ -19,6 +19,9 @@ public class MyJob {
     @Scheduled(initialDelay = 1000, fixedRate = 2000)
     public void doSomething() {
         meters.getCounter("abc").increment();
+        meters.getCounter("cde").increment();
+        meters.getSummary("abc").record(1000);
+        meters.getSummary("cde").record(1000);
     }
 
 }

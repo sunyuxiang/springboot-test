@@ -2,13 +2,12 @@ package com.example.demo.metrics;
 
 import com.google.common.collect.ImmutableMap;
 import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.lang.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -41,7 +40,10 @@ public class Meters implements MeterBinder {
         this.meterRegistry = registry;
     }
 
-
+    public DistributionSummary getSummary(String name) {
+        return meterRegistry
+                .summary(name, "avg", name + "_sum/" + name + "_count");
+    }
 //
 //
 //    public Timer getTimer(String timerName) {
